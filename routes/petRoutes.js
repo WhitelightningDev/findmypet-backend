@@ -1,15 +1,13 @@
 const express = require('express');
-const { addPet, getPets, updatePet, deletePet } = require('../controllers/petController');
 const router = express.Router();
+const petController = require('../controllers/petController');
 const authMiddleware = require('../middleware/authMiddleware');
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' }); // Handle file uploads
 
-// Middleware to protect routes
 router.use(authMiddleware);
 
-// Routes
-router.post('/add', addPet);         // Add a new pet
-router.get('/', getPets);            // Get all pets for the logged-in user
-router.put('/:petId', updatePet);    // Update a specific pet by ID
-router.delete('/:petId', deletePet); // Delete a specific pet by ID
+router.post('/add', upload.single('photo'), petController.addPet);
+router.get('/', petController.getPets);
 
 module.exports = router;

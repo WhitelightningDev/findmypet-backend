@@ -1,42 +1,38 @@
-// controllers/subscriptionController.js
 const Subscription = require('../models/Subscription');
-const User = require('../models/User');
 const paypalClient = require('../paypalConfig');
 const paypal = require('@paypal/checkout-server-sdk');
-const moment = require('moment'); // For date calculations
+const moment = require('moment');
 
 exports.subscribe = async (req, res) => {
-  const { planId, paymentMethod } = req.body; // `paymentMethod` is from PayPal
+  const { planId, paymentMethod } = req.body;
   try {
-    // Create a billing plan with PayPal
     const request = new paypal.subscriptions.SubscriptionCreateRequest();
     request.requestBody({
-      plan_id: planId, // PayPal Plan ID
-      start_time: moment().add(1, 'month').toDate().toISOString(), // Start the subscription in one month
+      plan_id: planId,
+      start_time: moment().add(1, 'month').toDate().toISOString(),
       application_context: {
-        return_url: 'https://yourwebsite.com/success', // Redirect after successful payment
-        cancel_url: 'https://yourwebsite.com/cancel',   // Redirect after canceling payment
+        return_url: 'https://yourwebsite.com/success',
+        cancel_url: 'https://yourwebsite.com/cancel',
       },
       subscriber: {
         email_address: req.user.email,
       },
       shipping_amount: {
-        currency_code: 'USD',
+        currency_code: 'ZAR',
         value: '0.00',
       },
     });
 
     const response = await paypalClient.execute(request);
 
-    // Save subscription details
     const subscription = new Subscription({
       user: req.user.id,
       planId,
       startDate: new Date(),
       initialPayment: 350,
-      monthlyPayment: 75,
+      monthlyPayment: 50,
       nextBillingDate: moment().add(1, 'month').toDate(),
-      paypalSubscriptionId: response.result.id, // Save PayPal subscription ID
+      paypalSubscriptionId: response.result.id,
     });
     await subscription.save();
 
@@ -64,7 +60,6 @@ exports.cancelSubscription = async (req, res) => {
       return res.status(404).json({ error: 'Subscription not found or not authorized' });
     }
 
-    // Cancel subscription in PayPal
     const request = new paypal.subscriptions.SubscriptionCancelRequest(subscription.paypalSubscriptionId);
     request.requestBody({});
     await paypalClient.execute(request);

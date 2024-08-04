@@ -2,6 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors'); // Import cors
+
+// Import routes
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const petRoutes = require('./routes/petRoutes');
@@ -17,9 +19,10 @@ app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/user', userRoutes);
-app.use('/api/pet', petRoutes);
-app.use('/api/subscription', subscriptionRoutes);
+app.use('/api/user', userRoutes); // Assuming userRoutes handle user-related API
+app.use('/api/pet', petRoutes); // Assuming petRoutes handle pet-related API
+app.use('/api/subscription', subscriptionRoutes); // Subscription API routes
+
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {

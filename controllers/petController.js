@@ -1,65 +1,31 @@
-// controllers/petController.js
 const Pet = require('../models/Pet');
-const User = require('../models/User');
 
+// Add a new pet
 exports.addPet = async (req, res) => {
-  const { name, breed, age, photo } = req.body;
   try {
-    const pet = new Pet({
+    const { name, breed, age } = req.body;
+    const photo = req.file ? req.file.path : ''; // Handle photo upload
+
+    const newPet = new Pet({
       name,
       breed,
       age,
       photo,
-      owner: req.user.id, // Associate pet with the logged-in user
+      user: req.user.id // Associate pet with the logged-in user
     });
-    await pet.save();
-    res.status(201).json({ message: 'Pet added successfully', pet });
-  } catch (error) {
-    res.status(500).json({ error: 'Server error' });
+    await newPet.save();
+    res.status(201).json(newPet);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to add pet', error: err.message });
   }
 };
 
+// Get all pets for the logged-in user
 exports.getPets = async (req, res) => {
   try {
-    const pets = await Pet.find({ owner: req.user.id });
+    const pets = await Pet.find({ user: req.user.id });
     res.status(200).json(pets);
-  } catch (error) {
-    res.status(500).json({ error: 'Server error' });
-  }
-};
-
-exports.updatePet = async (req, res) => {
-  const { petId } = req.params;
-  const { name, breed, age, photo } = req.body;
-  try {
-    const pet = await Pet.findById(petId);
-    if (!pet || pet.owner.toString() !== req.user.id) {
-      return res.status(404).json({ error: 'Pet not found or not authorized' });
-    }
-
-    if (name) pet.name = name;
-    if (breed) pet.breed = breed;
-    if (age) pet.age = age;
-    if (photo) pet.photo = photo;
-
-    await pet.save();
-    res.status(200).json({ message: 'Pet updated successfully', pet });
-  } catch (error) {
-    res.status(500).json({ error: 'Server error' });
-  }
-};
-
-exports.deletePet = async (req, res) => {
-  const { petId } = req.params;
-  try {
-    const pet = await Pet.findById(petId);
-    if (!pet || pet.owner.toString() !== req.user.id) {
-      return res.status(404).json({ error: 'Pet not found or not authorized' });
-    }
-
-    await pet.remove();
-    res.status(200).json({ message: 'Pet deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ error: 'Server error' });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch pets', error: err.message });
   }
 };
