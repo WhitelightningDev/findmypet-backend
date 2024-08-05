@@ -32,8 +32,8 @@ exports.subscribe = async (req, res) => {
       plan_id: planId,
       start_time: moment().add(1, 'month').toDate().toISOString(),
       application_context: {
-        return_url: 'https://yourwebsite.com/success',
-        cancel_url: 'https://yourwebsite.com/cancel',
+        return_url: 'https://yourwebsite.com/success', // Update this to your front-end URL
+        cancel_url: 'https://yourwebsite.com/cancel',   // Update this to your front-end URL
       },
       subscriber: {
         email_address: req.user.email,
@@ -59,7 +59,8 @@ exports.subscribe = async (req, res) => {
     });
     await subscription.save();
 
-    res.status(201).json({ message: 'Subscription successful', subscription });
+    // Send the subscription approval link to the client
+    res.status(201).json({ message: 'Subscription created successfully', approval_url: response.result.links.find(link => link.rel === 'approve').href });
   } catch (error) {
     console.error('Error subscribing:', error);
     res.status(500).json({ error: 'Server error' });
