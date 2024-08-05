@@ -9,5 +9,6 @@ router.use(authMiddleware);
 
 router.post('/add', upload.single('photo'), petController.addPet);
 router.get('/', petController.getPets);
+router.put('/:id/image', upload.single('photo'), petController.updatePetImage); // Route for updating pet image
 
 module.exports = router;

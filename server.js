@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const cors = require('cors'); // Import cors
+const cors = require('cors');
 
 // Import routes
 const authRoutes = require('./routes/authRoutes');
@@ -16,13 +16,13 @@ const app = express();
 // Middleware
 app.use(cors()); // Enable CORS
 app.use(express.json());
+app.use('/uploads', express.static('uploads'));
 
 // Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/user', userRoutes); // Assuming userRoutes handle user-related API
-app.use('/api/pet', petRoutes); // Assuming petRoutes handle pet-related API
-app.use('/api/subscription', subscriptionRoutes); // Subscription API routes
-
+app.use('/api/user', userRoutes);
+app.use('/api/pet', petRoutes);
+app.use('/api/subscription', subscriptionRoutes);
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {
