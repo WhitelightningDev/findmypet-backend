@@ -6,7 +6,7 @@ const fs = require('fs');
 exports.addPet = async (req, res) => {
   try {
     const { name, breed, age } = req.body;
-    const photo = req.file ? req.file.path.replace('uploads/', '') : ''; // Handle photo upload
+    const photo = req.file ? req.file.filename : ''; // Handle photo upload
 
     const newPet = new Pet({
       name,
@@ -51,7 +51,7 @@ exports.updatePetImage = async (req, res) => {
       }
 
       // Save new image path
-      pet.photo = req.file.path.replace('uploads/', ''); // Adjust path based on your upload setup
+      pet.photo = req.file.filename; // Adjust path based on your upload setup
       await pet.save();
       res.status(200).json({ message: 'Pet image updated successfully', pet });
     } else {
@@ -62,3 +62,26 @@ exports.updatePetImage = async (req, res) => {
   }
 };
 
+// Delete a pet
+exports.deletePet = async (req, res) => {
+  try {
+    const petId = req.params.id; // Get the pet ID from the URL
+    const pet = await Pet.findById(petId);
+    if (!pet) {
+      return res.status(404).json({ message: 'Pet not found' });
+    }
+
+    // Remove image if it exists
+    if (pet.photo) {
+      const imagePath = path.join(__dirname, '../uploads', pet.photo);
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+      }
+    }
+
+    await Pet.findByIdAndDelete(petId); // Corrected deletion method
+    res.status(200).json({ message: 'Pet deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to delete pet', error: err.message });
+  }
+};
