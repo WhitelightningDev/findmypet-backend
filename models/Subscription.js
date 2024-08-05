@@ -5,8 +5,8 @@ const subscriptionSchema = new mongoose.Schema({
   planId: String,
   startDate: Date,
   status: { type: String, enum: ['active', 'canceled'], default: 'active' },
-  initialPayment: { type: Number, default: 350 },
-  monthlyPayment: { type: Number, default: 75 },
+  initialPayment: Number,
+  monthlyPayment: Number,
   nextBillingDate: Date,
   paypalSubscriptionId: String, // PayPal subscription ID
 });
