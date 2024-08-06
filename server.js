@@ -14,14 +14,8 @@ dotenv.config();
 
 const app = express();
 
-// CORS configuration
-app.use(cors({
-  origin: 'https://whitelightningdev.github.io/findmypet/',
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-
 // Middleware
+app.use(cors()); // Enable CORS
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); // Serve static files
 
