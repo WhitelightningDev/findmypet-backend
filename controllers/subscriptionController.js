@@ -6,7 +6,7 @@ const moment = require('moment');
 // Example subscription plans with unique ids
 const subscriptionPlans = {
   'basic': {
-    id: 'basic',  // Unique id for the plan
+    id: 'P-4YG5972580690720XM2YVKCA', // Use your actual PayPal plan ID
     name: 'Basic Plan',
     initialPayment: 350,
     monthlyPayment: 75,
@@ -17,19 +17,22 @@ const subscriptionPlans = {
 // Subscribe to a plan
 exports.subscribe = async (req, res) => {
   const { planId } = req.body;
+  console.log('Received subscription request for planId:', planId);
 
   // Validate the planId
   if (!subscriptionPlans[planId]) {
+    console.error('Invalid subscription planId:', planId);
     return res.status(400).json({ error: 'Invalid subscription plan' });
   }
 
   const plan = subscriptionPlans[planId];
+  console.log('Subscription plan details:', plan);
 
   try {
     // Create a new PayPal subscription request
     const request = new paypal.subscriptions.SubscriptionCreateRequest();
     request.requestBody({
-      plan_id: planId,
+      plan_id: plan.id,
       start_time: moment().add(1, 'month').toDate().toISOString(),
       application_context: {
         return_url: 'https://yourwebsite.com/success', // Update this to your front-end URL
@@ -38,14 +41,13 @@ exports.subscribe = async (req, res) => {
       subscriber: {
         email_address: req.user.email,
       },
-      shipping_amount: {
-        currency_code: 'ZAR',
-        value: '0.00',
-      },
     });
+
+    console.log('PayPal subscription request body:', request.requestBody());
 
     // Execute the PayPal subscription request
     const response = await paypalClient.execute(request);
+    console.log('PayPal subscription response:', response);
 
     // Save the subscription to the database
     const subscription = new Subscription({
@@ -60,9 +62,14 @@ exports.subscribe = async (req, res) => {
     await subscription.save();
 
     // Send the subscription approval link to the client
-    res.status(201).json({ message: 'Subscription created successfully', approval_url: response.result.links.find(link => link.rel === 'approve').href });
+    const approvalUrl = response.result.links.find(link => link.rel === 'approve')?.href;
+    if (!approvalUrl) {
+      throw new Error('No approval link found in PayPal response');
+    }
+
+    res.status(201).json({ message: 'Subscription created successfully', approval_url: approvalUrl });
   } catch (error) {
-    console.error('Error subscribing:', error);
+    console.error('Error subscribing:', error.message, error.response ? error.response.data : 'No response data');
     res.status(500).json({ error: 'Server error' });
   }
 };
@@ -73,7 +80,7 @@ exports.getSubscriptions = async (req, res) => {
     const subscriptions = await Subscription.find({ user: req.user.id });
     res.status(200).json(subscriptions);
   } catch (error) {
-    console.error('Error fetching subscriptions:', error);
+    console.error('Error fetching subscriptions:', error.message);
     res.status(500).json({ error: 'Server error' });
   }
 };
@@ -98,7 +105,7 @@ exports.cancelSubscription = async (req, res) => {
 
     res.status(200).json({ message: 'Subscription canceled successfully', subscription });
   } catch (error) {
-    console.error('Error canceling subscription:', error);
+    console.error('Error canceling subscription:', error.message);
     res.status(500).json({ error: 'Server error' });
   }
 };
@@ -106,10 +113,9 @@ exports.cancelSubscription = async (req, res) => {
 // Get available subscription plans
 exports.getSubscriptionPlans = (req, res) => {
   try {
-    // Return subscription plans as an array
     res.status(200).json(Object.values(subscriptionPlans));
   } catch (error) {
-    console.error('Error fetching subscription plans:', error);
+    console.error('Error fetching subscription plans:', error.message);
     res.status(500).json({ error: 'Server error' });
   }
 };
