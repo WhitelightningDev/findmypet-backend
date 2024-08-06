@@ -19,6 +19,11 @@ app.use(cors()); // Enable CORS
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); // Serve static files
 
+// Root route
+app.get('/', (req, res) => {
+  res.send('Welcome to the Find My Pet backend!');
+});
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
