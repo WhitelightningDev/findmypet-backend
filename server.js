@@ -16,7 +16,7 @@ const app = express();
 
 // CORS configuration
 app.use(cors({
-  origin: 'https://findmypet-df0a76e6b00e.herokuapp.com',
+  origin: 'https://whitelightningdev.github.io', // Allow the frontend URL
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
