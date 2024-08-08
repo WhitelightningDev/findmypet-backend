@@ -16,7 +16,7 @@ const app = express();
 
 // CORS configuration
 app.use(cors({
-  origin: 'https://whitelightningdev.github.io/home', // Allow the frontend URL
+  origin: 'https://whitelightningdev.github.io', // Allow the frontend URL
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
