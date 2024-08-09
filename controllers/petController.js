@@ -5,13 +5,15 @@ const fs = require('fs');
 // Add a new pet
 exports.addPet = async (req, res) => {
   try {
-    const { name, breed, age } = req.body;
+    const { name, breed, age, type, tagType } = req.body;
     const photo = req.file ? req.file.filename : ''; // Handle photo upload
 
     const newPet = new Pet({
       name,
       breed,
       age,
+      type,  // Include the type of pet
+      tagType,  // Include the tag type
       photo,
       user: req.user.id // Associate pet with the logged-in user
     });
@@ -21,6 +23,7 @@ exports.addPet = async (req, res) => {
     res.status(500).json({ message: 'Failed to add pet', error: err.message });
   }
 };
+
 
 // Get all pets for the logged-in user
 exports.getPets = async (req, res) => {
