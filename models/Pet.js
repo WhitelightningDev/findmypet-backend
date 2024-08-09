@@ -1,36 +1,13 @@
 const mongoose = require('mongoose');
 
 const petSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true
-  },
-  breed: {
-    type: String,
-    required: true
-  },
-  age: {
-    type: Number,
-    required: true
-  },
-  type: {
-    type: String,
-    required: true
-  },
-  tag: {
-    type: String,
-    required: true
-  },
-  photo: {
-    type: String, // Stores the filename or path to the photo
-    required: false
-  },
-  tagImage: {
-    type: String, // Stores the filename or path to the tag image
-    required: false
-  }
+  name: { type: String, required: true },
+  breed: { type: String, required: true },
+  age: { type: Number, required: true },
+  type: { type: String, required: true },  // New field for pet type
+  tagType: { type: String, required: true }, // New field for tag type
+  photo: { type: String, default: '' }, // Optional field for pet photo
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
 });
 
-const Pet = mongoose.model('Pet', petSchema);
-
-module.exports = Pet;
+module.exports = mongoose.model('Pet', petSchema);

@@ -12,9 +12,9 @@ exports.addPet = async (req, res) => {
       name,
       breed,
       age,
-      type,
-      tagType, // Save tagType
-      photo, // Save photo
+      type,  // Include the type of pet
+      tagType,  // Include the tag type
+      photo,
       user: req.user.id // Associate pet with the logged-in user
     });
     await newPet.save();
@@ -23,6 +23,7 @@ exports.addPet = async (req, res) => {
     res.status(500).json({ message: 'Failed to add pet', error: err.message });
   }
 };
+
 
 // Get all pets for the logged-in user
 exports.getPets = async (req, res) => {
@@ -54,10 +55,11 @@ exports.updatePetImage = async (req, res) => {
 
       // Save new image path
       pet.photo = req.file.filename; // Adjust path based on your upload setup
+      await pet.save();
+      res.status(200).json({ message: 'Pet image updated successfully', pet });
+    } else {
+      res.status(400).json({ message: 'No image file provided' });
     }
-
-    await pet.save();
-    res.status(200).json({ message: 'Pet image updated successfully', pet });
   } catch (err) {
     res.status(500).json({ message: 'Failed to update pet image', error: err.message });
   }
@@ -72,7 +74,7 @@ exports.deletePet = async (req, res) => {
       return res.status(404).json({ message: 'Pet not found' });
     }
 
-    // Remove images if they exist
+    // Remove image if it exists
     if (pet.photo) {
       const imagePath = path.join(__dirname, '../uploads', pet.photo);
       if (fs.existsSync(imagePath)) {
@@ -80,7 +82,7 @@ exports.deletePet = async (req, res) => {
       }
     }
 
-    await Pet.findByIdAndDelete(petId);
+    await Pet.findByIdAndDelete(petId); // Corrected deletion method
     res.status(200).json({ message: 'Pet deleted successfully' });
   } catch (err) {
     res.status(500).json({ message: 'Failed to delete pet', error: err.message });
