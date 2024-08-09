@@ -6,15 +6,17 @@ const fs = require('fs');
 exports.addPet = async (req, res) => {
   try {
     const { name, breed, age, type, tagType } = req.body;
-    const photo = req.file ? req.file.filename : ''; // Handle photo upload
+    const photo = req.files['photo'] ? req.files['photo'][0].filename : ''; // Handle photo upload
+    const tagImage = req.files['tagImage'] ? req.files['tagImage'][0].filename : ''; // Handle tag image upload
 
     const newPet = new Pet({
       name,
       breed,
       age,
-      type,  // Include the type of pet
-      tagType,  // Include the tag type
+      type,
+      tagType,
       photo,
+      tagImage, // Save tag image
       user: req.user.id // Associate pet with the logged-in user
     });
     await newPet.save();
@@ -23,7 +25,6 @@ exports.addPet = async (req, res) => {
     res.status(500).json({ message: 'Failed to add pet', error: err.message });
   }
 };
-
 
 // Get all pets for the logged-in user
 exports.getPets = async (req, res) => {
@@ -44,7 +45,7 @@ exports.updatePetImage = async (req, res) => {
       return res.status(404).json({ message: 'Pet not found' });
     }
 
-    if (req.file) {
+    if (req.files['photo']) {
       // Remove old image if it exists
       if (pet.photo) {
         const oldImagePath = path.join(__dirname, '../uploads', pet.photo);
@@ -54,12 +55,24 @@ exports.updatePetImage = async (req, res) => {
       }
 
       // Save new image path
-      pet.photo = req.file.filename; // Adjust path based on your upload setup
-      await pet.save();
-      res.status(200).json({ message: 'Pet image updated successfully', pet });
-    } else {
-      res.status(400).json({ message: 'No image file provided' });
+      pet.photo = req.files['photo'][0].filename; // Adjust path based on your upload setup
     }
+
+    if (req.files['tagImage']) {
+      // Remove old tag image if it exists
+      if (pet.tagImage) {
+        const oldTagImagePath = path.join(__dirname, '../uploads', pet.tagImage);
+        if (fs.existsSync(oldTagImagePath)) {
+          fs.unlinkSync(oldTagImagePath);
+        }
+      }
+
+      // Save new tag image path
+      pet.tagImage = req.files['tagImage'][0].filename; // Adjust path based on your upload setup
+    }
+
+    await pet.save();
+    res.status(200).json({ message: 'Pet image updated successfully', pet });
   } catch (err) {
     res.status(500).json({ message: 'Failed to update pet image', error: err.message });
   }
@@ -74,7 +87,7 @@ exports.deletePet = async (req, res) => {
       return res.status(404).json({ message: 'Pet not found' });
     }
 
-    // Remove image if it exists
+    // Remove images if they exist
     if (pet.photo) {
       const imagePath = path.join(__dirname, '../uploads', pet.photo);
       if (fs.existsSync(imagePath)) {
@@ -82,7 +95,14 @@ exports.deletePet = async (req, res) => {
       }
     }
 
-    await Pet.findByIdAndDelete(petId); // Corrected deletion method
+    if (pet.tagImage) {
+      const tagImagePath = path.join(__dirname, '../uploads', pet.tagImage);
+      if (fs.existsSync(tagImagePath)) {
+        fs.unlinkSync(tagImagePath);
+      }
+    }
+
+    await Pet.findByIdAndDelete(petId);
     res.status(200).json({ message: 'Pet deleted successfully' });
   } catch (err) {
     res.status(500).json({ message: 'Failed to delete pet', error: err.message });
