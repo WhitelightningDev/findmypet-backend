@@ -6,14 +6,14 @@ const fs = require('fs');
 exports.addPet = async (req, res) => {
   try {
     const { name, breed, age } = req.body;
-    const photo = req.file ? req.file.filename : ''; // Handle photo upload
+    const photo = req.file ? req.file.filename : '';
 
     const newPet = new Pet({
       name,
       breed,
       age,
       photo,
-      user: req.user.id // Associate pet with the logged-in user
+      user: req.user.id
     });
     await newPet.save();
     res.status(201).json(newPet);
@@ -35,14 +35,13 @@ exports.getPets = async (req, res) => {
 // Update pet image
 exports.updatePetImage = async (req, res) => {
   try {
-    const petId = req.params.id; // Get the pet ID from the URL
+    const petId = req.params.id;
     const pet = await Pet.findById(petId);
     if (!pet) {
       return res.status(404).json({ message: 'Pet not found' });
     }
 
     if (req.file) {
-      // Remove old image if it exists
       if (pet.photo) {
         const oldImagePath = path.join(__dirname, '../uploads', pet.photo);
         if (fs.existsSync(oldImagePath)) {
@@ -50,8 +49,7 @@ exports.updatePetImage = async (req, res) => {
         }
       }
 
-      // Save new image path
-      pet.photo = req.file.filename; // Adjust path based on your upload setup
+      pet.photo = req.file.filename;
       await pet.save();
       res.status(200).json({ message: 'Pet image updated successfully', pet });
     } else {
@@ -65,13 +63,12 @@ exports.updatePetImage = async (req, res) => {
 // Delete a pet
 exports.deletePet = async (req, res) => {
   try {
-    const petId = req.params.id; // Get the pet ID from the URL
+    const petId = req.params.id;
     const pet = await Pet.findById(petId);
     if (!pet) {
       return res.status(404).json({ message: 'Pet not found' });
     }
 
-    // Remove image if it exists
     if (pet.photo) {
       const imagePath = path.join(__dirname, '../uploads', pet.photo);
       if (fs.existsSync(imagePath)) {
@@ -79,7 +76,7 @@ exports.deletePet = async (req, res) => {
       }
     }
 
-    await Pet.findByIdAndDelete(petId); // Corrected deletion method
+    await Pet.findByIdAndDelete(petId);
     res.status(200).json({ message: 'Pet deleted successfully' });
   } catch (err) {
     res.status(500).json({ message: 'Failed to delete pet', error: err.message });
