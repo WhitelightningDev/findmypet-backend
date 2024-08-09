@@ -5,13 +5,15 @@ const fs = require('fs');
 // Add a new pet
 exports.addPet = async (req, res) => {
   try {
-    const { name, breed, age } = req.body;
+    const { name, breed, age, type, tagType } = req.body;
     const photo = req.file ? req.file.filename : '';
 
     const newPet = new Pet({
       name,
       breed,
       age,
+      type,
+      tagType,
       photo,
       user: req.user.id
     });
