@@ -17,8 +17,8 @@ const petSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  tag: {
-    type: String,
+  tagType: {
+    type: String, // Adjust this to match your frontend
     required: true
   },
   photo: {

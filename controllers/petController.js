@@ -36,7 +36,7 @@ exports.getPets = async (req, res) => {
   }
 };
 
-// Update pet image
+// Update pet image and tag image
 exports.updatePetImage = async (req, res) => {
   try {
     const petId = req.params.id; // Get the pet ID from the URL

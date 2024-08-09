@@ -16,11 +16,19 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
+// Middleware for authentication
 router.use(authMiddleware);
 
-router.post('/add', upload.single('photo'), petController.addPet);
+// Route to add a new pet with multiple files
+router.post('/add', upload.fields([{ name: 'photo', maxCount: 1 }, { name: 'tagImage', maxCount: 1 }]), petController.addPet);
+
+// Route to get all pets
 router.get('/', petController.getPets);
-router.put('/:id/image', upload.single('photo'), petController.updatePetImage); // Route for updating pet image
-router.delete('/:id', petController.deletePet); // Route for deleting a pet
+
+// Route to update pet image and tag image
+router.put('/:id/image', upload.fields([{ name: 'photo', maxCount: 1 }, { name: 'tagImage', maxCount: 1 }]), petController.updatePetImage);
+
+// Route to delete a pet
+router.delete('/:id', petController.deletePet);
 
 module.exports = router;
