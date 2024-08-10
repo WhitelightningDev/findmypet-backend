@@ -25,6 +25,9 @@ router.post('/add', upload.single('photo'), petController.addPet);
 // Route to get all pets for the logged-in user
 router.get('/', petController.getPets);
 
+// Route to get details of a specific pet by ID
+router.get('/:id', petController.getPetById);
+
 // Route to update a pet's image
 router.put('/:id/image', upload.single('photo'), petController.updatePetImage);
 
