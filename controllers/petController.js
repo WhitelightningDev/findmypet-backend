@@ -49,6 +49,7 @@ exports.getPetById = async (req, res) => {
   }
 };
 
+
 // Update pet image
 exports.updatePetImage = async (req, res) => {
   try {
