@@ -37,9 +37,11 @@ exports.register = async (req, res) => {
     // Send signup confirmation email
     try {
       await sendSignupConfirmationEmail(newUser);
+      console.log('Signup confirmation email sent to:', newUser.email);
     } catch (emailError) {
       console.error('Error sending email:', emailError);
       // Log email error but don't fail registration
+      // You might also want to notify the user about the email issue here
     }
 
     res.status(201).json({ message: 'User registered successfully', token });

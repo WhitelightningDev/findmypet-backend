@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const dotenv = require ('dotenv');
 
 // Create a transporter
 const transporter = nodemailer.createTransport({
