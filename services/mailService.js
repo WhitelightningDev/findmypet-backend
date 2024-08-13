@@ -1,9 +1,12 @@
 const nodemailer = require('nodemailer');
-const dotenv = require ('dotenv');
+const dotenv = require('dotenv');
 
-// Create a transporter
+// Load environment variables from .env file
+dotenv.config();
+
+// Create a transporter using environment variables
 const transporter = nodemailer.createTransport({
-  service: 'Gmail', // or another email service
+  service: 'gmail', // Use 'gmail' if you're using Gmail
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
@@ -13,14 +16,14 @@ const transporter = nodemailer.createTransport({
 // Function to send a signup confirmation email
 const sendSignupConfirmationEmail = async (user) => {
   const mailOptions = {
-    from: process.env.EMAIL_USER,
-    to: user.email,
-    subject: 'Signup Confirmation',
-    text: `Hello ${user.name},\n\nThank you for signing up! Here are your details:\n\nName: ${user.name} ${user.surname}\nEmail: ${user.email}\n\nBest Regards,\nFind My Pet Team`
+    from: process.env.EMAIL_USER, // Sender address
+    to: user.email, // Recipient address
+    subject: 'Signup Confirmation', // Subject line
+    text: `Hello ${user.name},\n\nThank you for signing up! Here are your details:\n\nName: ${user.name} ${user.surname}\nEmail: ${user.email}\n\nBest Regards,\nFind My Pet Team` // Email body
   };
 
   try {
-    await transporter.sendMail(mailOptions);
+    await transporter.sendMail(mailOptions); // Send email
     console.log('Signup confirmation email sent successfully');
   } catch (error) {
     console.error('Error sending signup confirmation email:', error);
