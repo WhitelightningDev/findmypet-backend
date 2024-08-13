@@ -23,7 +23,7 @@ const sendSignupConfirmationEmail = async (user) => {
     console.log('Signup confirmation email sent successfully');
   } catch (error) {
     console.error('Error sending signup confirmation email:', error);
-    throw new Error('Error sending signup confirmation email');
+    throw error; // Ensure the error is thrown to be caught in the controller
   }
 };
 
