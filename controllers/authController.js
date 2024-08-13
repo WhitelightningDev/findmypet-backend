@@ -2,6 +2,7 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const generateToken = require('../jwtHelper');
 const dotenv = require('dotenv');
+const { sendSignupConfirmationEmail } = require('../services/mailService'); // Import the mail service
 
 dotenv.config();
 
@@ -32,6 +33,14 @@ exports.register = async (req, res) => {
 
     // Generate JWT token
     const token = generateToken(newUser._id);
+
+    // Send signup confirmation email
+    try {
+      await sendSignupConfirmationEmail(newUser);
+    } catch (emailError) {
+      console.error('Error sending email:', emailError);
+      // Log email error but don't fail registration
+    }
 
     res.status(201).json({ message: 'User registered successfully', token });
   } catch (error) {
