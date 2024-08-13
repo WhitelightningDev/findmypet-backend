@@ -18,7 +18,7 @@ const sendSignupConfirmationEmail = async (user) => {
   const mailOptions = {
     from: `"Find My Pet Team" <${process.env.EMAIL_USER}>`, // Professional sender address
     to: user.email,
-    subject: 'Welcome to Find My Pet!',
+    subject: 'Welcome to Found Your Pet!',
     html: `
       <div style="font-family: Arial, sans-serif; color: #333;">
         <h2>Hello ${user.name},</h2>
@@ -29,7 +29,7 @@ const sendSignupConfirmationEmail = async (user) => {
           <li><strong>Email:</strong> ${user.email}</li>
         </ul>
         <p>If you have any questions, feel free to reply to this email. We're here to help!</p>
-        <p>Best Regards,<br>The Find My Pet Team</p>
+        <p>Best Regards,<br>The Found Your Pet Team</p>
         <hr />
         <p style="font-size: 12px; color: #777;">This is an automated message, please do not reply.</p>
         <p style="font-size: 10px; color: #999; margin-top: 20px;">
