@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 const User = require('../models/User');
-const { sendEmail } = require('../services/mailService'); // Import mail service
+const { sendSignupConfirmationEmail } = require('../services/mailService'); // Import mail service
 
 dotenv.config();
 
@@ -16,10 +16,16 @@ const authMiddleware = async (req, res, next) => {
     req.user = await User.findById(decoded.id).select('-password'); // Exclude password
 
     // Send email notification (example: user authentication)
-    await sendEmail(req.user.email, 'Successful Login', 'You have successfully logged in.');
+    try {
+      await sendSignupConfirmationEmail(req.user);
+    } catch (emailError) {
+      console.error('Error sending email:', emailError);
+      // Optionally handle the email error (e.g., log it, notify the user, etc.)
+    }
 
     next();
   } catch (error) {
+    console.error('Error verifying token:', error);
     res.status(401).json({ error: 'Invalid token' });
   }
 };

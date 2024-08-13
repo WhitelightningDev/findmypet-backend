@@ -1,27 +1,30 @@
 const nodemailer = require('nodemailer');
 
+// Create a transporter
 const transporter = nodemailer.createTransport({
-  service: 'gmail', // or your email service provider
+  service: 'Gmail', // or another email service
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
+    pass: process.env.EMAIL_PASS
+  }
 });
 
-const sendEmail = async (to, subject, text) => {
+// Function to send a signup confirmation email
+const sendSignupConfirmationEmail = async (user) => {
   const mailOptions = {
     from: process.env.EMAIL_USER,
-    to,
-    subject,
-    text,
+    to: user.email,
+    subject: 'Signup Confirmation',
+    text: `Hello ${user.name},\n\nThank you for signing up! Here are your details:\n\nName: ${user.name} ${user.surname}\nEmail: ${user.email}\n\nBest Regards,\nFind My Pet Team`
   };
 
   try {
     await transporter.sendMail(mailOptions);
-    console.log('Email sent successfully');
+    console.log('Signup confirmation email sent successfully');
   } catch (error) {
-    console.error('Error sending email:', error);
+    console.error('Error sending signup confirmation email:', error);
+    throw new Error('Error sending signup confirmation email');
   }
 };
 
-module.exports = { sendEmail };
+module.exports = { sendSignupConfirmationEmail };
