@@ -17,7 +17,7 @@ const app = express();
 // CORS configuration
 app.use(cors({
   // origin: 'https://localhost:3000/', // Allow the frontend URL
-  origin: 'https://whitelightningdev.github.io', // Allow the frontend URL
+  origin: 'https://www.foundyourpet.co.za/', // Allow the frontend URL
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
